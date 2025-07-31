@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.5' // Update to the latest version
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com.example'
@@ -15,45 +15,61 @@ java {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'libs' // This tells Gradle to look for .jar files in the libs/ folder
+    }
 }
 
-
 dependencies {
+
+    // Spring Boot Web + GraphQL
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
-    
+
     // OpenTelemetry
     implementation 'io.opentelemetry:opentelemetry-api:1.32.0'
     implementation 'io.opentelemetry:opentelemetry-sdk:1.32.0'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.32.0'
     implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.32.0'
     implementation 'io.opentelemetry.semconv:opentelemetry-semconv:1.21.0-alpha'
-    
-    // Prometheus and Micrometer
+
+    // Prometheus / Micrometer
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    
+
     // Logging dependencies
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
     implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation files('splunk-library-javalogging-1.11.7.jar')
-    
+
+    // ✅ SPLUNK logger (from local JAR in libs/)
+    implementation name: 'splunk-library-javalogging-1.11.7'
+    implementation 'com.splunk.logging:splunk-library-javalogging:1.11.7' // Use latest version if available
+
+    // ✅ Required transitive dependencies (manually added)
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.14'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.5'
+
+    // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webflux'
     testImplementation 'org.springframework.graphql:spring-graphql-test'
+
 }
 
 bootRun {
     jvmArgs = [
+        // Uncomment to enable telemetry
         // "-javaagent:./opentelemetry-javaagent.jar",
         // "-Dotel.exporter.otlp.protocol=http/protobuf",
         // "-Dotel.exporter.otlp.endpoint=http://otel-collector:4318",
         
+        // Uncomment to enable Pyroscope
         // "-javaagent:./pyroscope.jar",
         // "-Dpyroscope.server.address=http://pyroscope:4040",
         // "-Dpyroscope.application.name=java-service-1"
-
     ]
 }
 
