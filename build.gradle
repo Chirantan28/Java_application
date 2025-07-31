@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.5' // Update to the latest version
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    
+    // OpenTelemetry
+    implementation 'io.opentelemetry:opentelemetry-api:1.32.0'
+    implementation 'io.opentelemetry:opentelemetry-sdk:1.32.0'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.32.0'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.32.0'
+    implementation 'io.opentelemetry.semconv:opentelemetry-semconv:1.21.0-alpha'
+    
+    // Prometheus and Micrometer
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    
+    // Logging dependencies
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation files('splunk-library-javalogging-1.11.7.jar')
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework:spring-webflux'
+    testImplementation 'org.springframework.graphql:spring-graphql-test'
+}
+
+bootRun {
+    jvmArgs = [
+        // "-javaagent:./opentelemetry-javaagent.jar",
+        // "-Dotel.exporter.otlp.protocol=http/protobuf",
+        // "-Dotel.exporter.otlp.endpoint=http://otel-collector:4318",
+        
+        // "-javaagent:./pyroscope.jar",
+        // "-Dpyroscope.server.address=http://pyroscope:4040",
+        // "-Dpyroscope.application.name=java-service-1"
+
+    ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

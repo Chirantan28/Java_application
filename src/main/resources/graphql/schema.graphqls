@@ -1,0 +1,30 @@
+# This is the GraphQL schema definition for the application.
+
+type Query {
+    demo(id: ID!): Demo
+    demos: [Demo]
+    getMessage(id: ID!): Demo
+    getAllMessages: [Demo]
+    getMessagesByLevel(level: String!): [Demo]
+}
+
+type Mutation {
+    createDemo(input: DemoInput!): Demo
+    updateDemo(id: ID!, input: DemoInput!): Demo
+    deleteDemo(id: ID!): Boolean
+    createMessage(message: String!): Demo
+    updateMessage(id: ID!, message: String!): Demo
+    deleteMessage(id: ID!): Boolean
+}
+
+type Demo {
+    id: ID!
+    message: String!
+    timestamp: String!
+    level: String!
+}
+
+input DemoInput {
+    name: String!
+    description: String
+}

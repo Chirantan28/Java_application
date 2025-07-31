@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+application:
+  name: spring-boot-multi-api
+  description: A sample Spring Boot application with REST, gRPC, and GraphQL APIs.
+  version: 0.0.1
+  spring:
+    datasource:
+      url: jdbc:h2:mem:testdb
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+    h2:
+      console:
+        enabled: true
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+    
+    graphql:
+      servlet:
+        mapping: /graphql
+        enabled: true
+      graphiql:
+        enabled: true
+      path: /graphql
+      schema:
+        locations: classpath:graphql/
+        printer:
+          enabled: true
+    openTelemetry:
+      enabled: true
+      endpoint: http://otel-collector:4317
+      http-endpoint: http://otel-collector:4318
+
+logging:
+  level:
+    root: INFO
+    com.example.demo: DEBUG
+    io.opentelemetry: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} trace_id=%X{trace_id} span_id=%X{span_id} - %msg%n"
+  loki:
+    url: http://loki:3100
+
+otel:
+  traces:
+    exporter: otlp
+    endpoint: http://otel-collector:4317
+    http-endpoint: http://otel-collector:4317
+  metrics:
+    exporter: otlp
+    endpoint: http://otel-collector:4317
+    http-endpoint: http://otel-collector:4317
+  logs:
+    exporter: otlp
+  exporter:
+    otlp:
+      endpoint: http://otel-collector:4317
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
