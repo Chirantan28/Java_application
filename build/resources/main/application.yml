@@ -41,10 +41,22 @@ logging:
     com.example.demo: DEBUG
     io.opentelemetry: DEBUG
     org.springframework.web: DEBUG
+    com.splunk.logging: DEBUG  # Enable debug logging for Splunk
   pattern:
-    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} trace_id=%X{trace_id} span_id=%X{span_id} - %msg%n"
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   loki:
     url: http://loki:3100
+  # Splunk Configuration
+  splunk:
+    url: http://localhost:8088
+    token: 8357121e-7e1b-4000-aa1d-f3b482531210
+    source: spring-boot-multi-api
+    index: main
+    batch-size: 100
+    batch-interval: 1000
+    timeout: 30000
+    retries: 5
+    retry-interval: 1000
 
 otel:
   traces:

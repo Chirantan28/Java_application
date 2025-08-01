@@ -44,13 +44,16 @@ dependencies {
 
     // ✅ SPLUNK logger (from local JAR in libs/)
     implementation name: 'splunk-library-javalogging-1.11.7'
-    implementation 'com.splunk.logging:splunk-library-javalogging:1.11.7' // Use latest version if available
+    // Removed conflicting Maven dependency
 
     // ✅ Required transitive dependencies (manually added)
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
     implementation 'org.apache.httpcomponents:httpcore:4.4.14'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.5'
+    // Removed explicit Jackson versions to let Spring Boot manage them
+    
+    // ✅ Additional dependencies required by Splunk library
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
