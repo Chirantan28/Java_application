@@ -39,37 +39,66 @@ public class SplunkConnectionTest implements CommandLineRunner {
         logger.info("=== SPLUNK CONNECTION TEST COMPLETED ===");
     }
 
+    // private void testSplunkConnection() {
+    //     try {
+    //         HttpClient client = HttpClient.newHttpClient();
+    //         HttpRequest request = HttpRequest.newBuilder()
+    //             .uri(URI.create(splunkUrl + "/services/collector"))
+    //             .timeout(java.time.Duration.ofSeconds(5))
+    //             .build();
+            
+    //         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    //         int responseCode = response.statusCode();
+    //         logger.info("Splunk connection test - Response code: {}", responseCode);
+            
+    //         if (responseCode == 200) {
+    //             logger.info("✅ Splunk is accessible and responding");
+    //         } else if (responseCode == 401) {
+    //             logger.warn("⚠️ Splunk is accessible but authentication failed - check token");
+    //         } else if (responseCode == 404) {
+    //             logger.warn("⚠️ Splunk is accessible but HTTP Event Collector might not be enabled");
+    //         } else {
+    //             logger.warn("⚠️ Splunk responded with unexpected code: {}", responseCode);
+    //         }
+            
+    //     } catch (Exception e) {
+    //         logger.error("❌ Failed to connect to Splunk: {}", e.getMessage());
+    //         logger.info("💡 Troubleshooting tips:");
+    //         logger.info("   1. Ensure Splunk is running");
+    //         logger.info("   2. Verify HTTP Event Collector is enabled");
+    //         logger.info("   3. Check if the URL is correct: {}", splunkUrl);
+    //         logger.info("   4. Try HTTP instead of HTTPS if SSL is not configured");
+    //     }
+    // }
     private void testSplunkConnection() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(splunkUrl + "/services/collector"))
-                .timeout(java.time.Duration.ofSeconds(5))
-                .build();
-            
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            int responseCode = response.statusCode();
-            logger.info("Splunk connection test - Response code: {}", responseCode);
-            
-            if (responseCode == 200) {
-                logger.info("✅ Splunk is accessible and responding");
-            } else if (responseCode == 401) {
-                logger.warn("⚠️ Splunk is accessible but authentication failed - check token");
-            } else if (responseCode == 404) {
-                logger.warn("⚠️ Splunk is accessible but HTTP Event Collector might not be enabled");
-            } else {
-                logger.warn("⚠️ Splunk responded with unexpected code: {}", responseCode);
-            }
-            
-        } catch (Exception e) {
-            logger.error("❌ Failed to connect to Splunk: {}", e.getMessage());
-            logger.info("💡 Troubleshooting tips:");
-            logger.info("   1. Ensure Splunk is running");
-            logger.info("   2. Verify HTTP Event Collector is enabled");
-            logger.info("   3. Check if the URL is correct: {}", splunkUrl);
-            logger.info("   4. Try HTTP instead of HTTPS if SSL is not configured");
+    try {
+        HttpClient client = HttpClient.newHttpClient();
+
+        String url = splunkUrl + "/services/collector/event"; // corrected endpoint
+        String payload = "{\"event\":\"Splunk connection test at " + LocalDateTime.now() + "\"}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .timeout(java.time.Duration.ofSeconds(5))
+            .header("Authorization", "Splunk " + splunkToken)  // required auth header
+            .header("Content-Type", "application/json")         // required content type
+            .POST(HttpRequest.BodyPublishers.ofString(payload)) // use POST method
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int code = response.statusCode();
+        logger.info("Splunk connection test - Response code: {}", code);
+
+        if (code == 200) {
+            logger.info("✅ Splunk HEC is working!");
+        } else {
+            logger.warn("⚠️ Unexpected response from Splunk: {}", response.body());
         }
+
+    } catch (Exception e) {
+        logger.error("❌ Failed to connect to Splunk: {}", e.getMessage());
     }
+}
 
     private void generateTestLogs() {
         logger.info("🔍 Generating test logs for Splunk verification...");

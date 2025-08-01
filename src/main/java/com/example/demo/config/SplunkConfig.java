@@ -16,7 +16,7 @@ public class SplunkConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SplunkConfig.class);
 
-    @Value("${logging.splunk.url:https://localhost:8088}")
+    @Value("${logging.splunk.url:http://localhost:8088}")
     private String splunkUrl;
 
     @Value("${logging.splunk.token:8357121e-7e1b-4000-aa1d-f3b482531210}")

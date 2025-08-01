@@ -19,7 +19,7 @@ public class CustomSplunkAppender extends AppenderBase<ILoggingEvent> {
     
     private static final Logger logger = LoggerFactory.getLogger(CustomSplunkAppender.class);
     
-    private String url = "https://localhost:8088/services/collector/event";
+    private String url = "http://localhost:8088/services/collector/event";
     private String token = "8357121e-7e1b-4000-aa1d-f3b482531210";
     private String source = "spring-boot-multi-api";
     private String sourcetype = "_json";
