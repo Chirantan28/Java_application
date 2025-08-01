@@ -10,16 +10,34 @@
         </encoder>
     </appender>
 
-    <!-- SPLUNK Appender -->
+    <!-- SPLUNK Appender with HTTP to avoid SSL issues -->
     <appender name="SPLUNK" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
         <url>http://localhost:8088</url>
         <token>8357121e-7e1b-4000-aa1d-f3b482531210</token>
         <source>spring-boot-multi-api</source>
         <sourcetype>_json</sourcetype>
         <index>main</index>
+        
+        <!-- Connection settings -->
+        <batch_interval>1000</batch_interval>
+        <retries_on_error>5</retries_on_error>
+        
+        <!-- Use standard pattern layout -->
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </layout>
+    </appender>
+
+    <!-- Fallback appender for Splunk failures -->
+    <appender name="SPLUNK_FALLBACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/splunk-fallback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/splunk-fallback.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- Root Logger -->
@@ -27,5 +45,17 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="SPLUNK"/>
     </root>
+
+    <!-- Specific logger for Splunk errors -->
+    <logger name="com.splunk.logging" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SPLUNK_FALLBACK"/>
+    </logger>
+
+    <!-- Logger for application logs -->
+    <logger name="com.example.demo" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SPLUNK"/>
+    </logger>
 
 </configuration>

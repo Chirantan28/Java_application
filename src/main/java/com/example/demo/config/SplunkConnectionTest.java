@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
 import java.time.LocalDateTime;
 
 @Component
@@ -39,13 +41,14 @@ public class SplunkConnectionTest implements CommandLineRunner {
 
     private void testSplunkConnection() {
         try {
-            URL url = new URL(splunkUrl + "/services/collector");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(splunkUrl + "/services/collector"))
+                .timeout(java.time.Duration.ofSeconds(5))
+                .build();
             
-            int responseCode = connection.getResponseCode();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int responseCode = response.statusCode();
             logger.info("Splunk connection test - Response code: {}", responseCode);
             
             if (responseCode == 200) {

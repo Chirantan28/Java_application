@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import jakarta.annotation.PostConstruct;
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
 
 @Configuration
 @PropertySource("classpath:application.yml")
@@ -36,6 +38,34 @@ public class SplunkConfig {
         logger.info("Splunk Source: {}", splunkSource);
         logger.info("Splunk Index: {}", splunkIndex);
         logger.info("=====================================");
+        
+        // Configure SSL to trust all certificates for Splunk
+        configureSSLForSplunk();
+    }
+    
+    private void configureSSLForSplunk() {
+        try {
+            // Create a trust manager that trusts all certificates
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) { }
+                }
+            };
+
+            // Create SSL context that trusts all certificates
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            
+            // Set as default SSL context
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+            
+            logger.info("SSL certificate validation disabled for Splunk connections");
+        } catch (Exception e) {
+            logger.error("Failed to configure SSL for Splunk: {}", e.getMessage());
+        }
     }
 
     public String getSplunkUrl() {
